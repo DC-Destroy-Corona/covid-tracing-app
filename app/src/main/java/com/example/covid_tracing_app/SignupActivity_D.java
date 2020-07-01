@@ -8,15 +8,15 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SignupActivity_D extends AppCompatActivity {
-    Button btnNext;
+    Button btnFinish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_d);
-        btnNext = (Button)findViewById(R.id.buttonNext);
+        btnFinish = (Button)findViewById(R.id.buttonFinish);
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
+        btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
