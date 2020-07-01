@@ -15,9 +15,10 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.666" />
+        app:layout_constraintVertical_bias="0.679" />
 
     <TextView
         android:id="@+id/width"
@@ -25,11 +26,13 @@
         android:layout_height="35dp"
         android:gravity="center"
         android:text="© 2020 Coivd Tracer FROM DC"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.729" />
+        app:layout_constraintVertical_bias="0.752" />
 
     <TextView
         android:id="@+id/textView"
@@ -42,42 +45,50 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.242" />
+        app:layout_constraintVertical_bias="0.224" />
 
     <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:background="@drawable/editemail"
         android:ems="15"
         android:hint="이메일"
         android:inputType="textEmailAddress"
+        android:paddingLeft="15dp"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.354" />
+        app:layout_constraintVertical_bias="0.352" />
 
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:background="@drawable/editpassowrd"
         android:ems="15"
         android:hint="비밀번호"
         android:inputType="textPassword"
+        android:paddingLeft="15dp"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.432" />
+        app:layout_constraintVertical_bias="0.43" />
 
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:background="@drawable/btnlogin"
         android:ems="15"
         android:gravity="center_horizontal|top"
+        android:paddingTop="6dp"
         android:text="로그인"
         android:textIsSelectable="false"
         android:textSize="18sp"
@@ -91,14 +102,16 @@
         android:id="@+id/buttonSignup"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:background="@drawable/btnsignup"
         android:ems="15"
         android:gravity="center_horizontal|top"
+        android:paddingTop="6dp"
         android:text="회원가입"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.592" />
+        app:layout_constraintVertical_bias="0.598" />
 </androidx.constraintlayout.widget.ConstraintLayout>
