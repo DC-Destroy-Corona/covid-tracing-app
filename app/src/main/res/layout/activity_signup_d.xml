@@ -26,9 +26,11 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="@color/colorPrimary"
         android:elevation="10dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +43,7 @@
             android:paddingLeft="15dp"
             android:text="회원가입"
             android:textColor="@color/colorAccent"
-            android:textSize="18sp"
+            android:textSize="20sp"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="16dp">
 
