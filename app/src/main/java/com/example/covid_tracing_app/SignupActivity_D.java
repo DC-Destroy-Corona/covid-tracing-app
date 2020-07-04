@@ -15,7 +15,11 @@ public class SignupActivity_D extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_d);
         btnFinish = (Button)findViewById(R.id.buttonFinish);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
