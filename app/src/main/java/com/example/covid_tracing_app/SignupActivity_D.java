@@ -14,6 +14,7 @@ public class SignupActivity_D extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_d);
+
         btnFinish = (Button)findViewById(R.id.buttonFinish);
     }
 
