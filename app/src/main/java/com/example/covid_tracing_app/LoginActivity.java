@@ -16,6 +16,8 @@ public class LoginActivity extends AppCompatActivity {
     EditText editPassword;
     Button btnLogin;
     Button btnSignup;
+    private boolean isEmailEnable = false;
+    private boolean isPasswordEnable = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,63 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        editEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length()>=10){
+                    isEmailEnable = true;
+                }
+                else{
+                    isEmailEnable = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(isEmailEnable&&isPasswordEnable){
+                    btnLogin.setBackground(ContextCompat.getDrawable(LoginActivity.this, R.drawable.btnlogin));
+                    btnLogin.setEnabled(true);
+                }
+                else{
+                    btnLogin.setBackground(ContextCompat.getDrawable(LoginActivity.this, R.drawable.btnlogindisable));
+                    btnLogin.setEnabled(false);
+                }
+            }
+        });
+        editPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length()>=8){
+                    isPasswordEnable = true;
+                }
+                else{
+                    isPasswordEnable = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(isEmailEnable&&isPasswordEnable){
+                    btnLogin.setBackground(ContextCompat.getDrawable(LoginActivity.this, R.drawable.btnlogin));
+                    btnLogin.setEnabled(true);
+                }
+                else{
+                    btnLogin.setBackground(ContextCompat.getDrawable(LoginActivity.this, R.drawable.btnlogindisable));
+                    btnLogin.setEnabled(false);
+                }
+            }
+        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,21 +113,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        editEmail.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
     }
 }

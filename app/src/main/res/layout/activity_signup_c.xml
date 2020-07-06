@@ -162,6 +162,7 @@
         android:text="가입"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -188,7 +189,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="15dp"
             android:text="회원가입"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorActive"
             android:textSize="20sp"
             tools:layout_editor_absoluteX="16dp">
 

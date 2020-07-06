@@ -34,6 +34,7 @@
         android:text="다음"
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +62,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="15dp"
             android:text="회원가입"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorActive"
             android:textSize="20sp"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="4dp">
@@ -111,7 +112,7 @@
                 android:textColor="@color/colorTextMain" />
 
             <CheckBox
-                android:id="@+id/checkBox2"
+                android:id="@+id/checkBoxAgree"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="left|end"
