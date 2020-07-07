@@ -8,21 +8,21 @@
     tools:context=".LoginActivity">
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/textViewFind"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:gravity="center"
         android:text="아이디 / 비밀번호 찾기"
         android:textColor="@color/colorTextMain"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/width"
+        app:layout_constraintBottom_toTopOf="@+id/textViewCopyright"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonSignup"
         app:layout_constraintVertical_bias="0.549" />
 
     <TextView
-        android:id="@+id/width"
+        android:id="@+id/textViewCopyright"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:gravity="center"

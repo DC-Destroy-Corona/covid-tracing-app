@@ -24,7 +24,7 @@
         app:layout_constraintVertical_bias="0.183" />
 
     <EditText
-        android:id="@+id/editTextEmail4"
+        android:id="@+id/editTextCode"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:background="@drawable/editemail"
@@ -39,11 +39,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin3"
+        app:layout_constraintTop_toBottomOf="@+id/buttonGetCode"
         app:layout_constraintVertical_bias="0.12" />
 
     <EditText
-        android:id="@+id/editTextEmail3"
+        android:id="@+id/editTextEmail"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:background="@drawable/editemail"
@@ -62,25 +62,27 @@
         app:layout_constraintVertical_bias="0.111" />
 
     <TextView
-        android:id="@+id/title2"
+        android:id="@+id/textViewNoCode"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:gravity="center"
         android:text="이메일을 받지 못했습니다."
-        android:textColor="@color/colorTextMain"
+        android:textColor="@color/colorTextHidden"
         android:textSize="18sp"
+        android:enabled="false"
+        android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/buttonNext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin4"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCheckCode"
         app:layout_constraintVertical_bias="0.102" />
 
     <Button
-        android:id="@+id/buttonLogin4"
+        android:id="@+id/buttonCheckCode"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:background="@drawable/btnlogin"
+        android:background="@drawable/btnlogindisable"
         android:ems="15"
         android:gravity="center_horizontal|top"
         android:paddingTop="6dp"
@@ -88,18 +90,19 @@
         android:textColor="@color/colorActive"
         android:textIsSelectable="false"
         android:textSize="18sp"
+        android:enabled="false"
         app:layout_constraintBottom_toTopOf="@+id/buttonNext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail4"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCode"
         app:layout_constraintVertical_bias="0.050000012" />
 
     <Button
-        android:id="@+id/buttonLogin3"
+        android:id="@+id/buttonGetCode"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:background="@drawable/btnlogin"
+        android:background="@drawable/btnlogindisable"
         android:ems="15"
         android:gravity="center_horizontal|top"
         android:paddingTop="6dp"
@@ -107,11 +110,12 @@
         android:textColor="@color/colorActive"
         android:textIsSelectable="false"
         android:textSize="18sp"
+        android:enabled="false"
         app:layout_constraintBottom_toTopOf="@+id/buttonNext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail3"
+        app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
         app:layout_constraintVertical_bias="0.029999971" />
 
     <Button
