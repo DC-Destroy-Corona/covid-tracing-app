@@ -24,25 +24,6 @@
         app:layout_constraintVertical_bias="0.183" />
 
     <EditText
-        android:id="@+id/editTextCode"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:background="@drawable/editemail"
-        android:ems="15"
-        android:hint="인증 코드"
-        android:inputType="number"
-        android:paddingLeft="15dp"
-        android:textColor="@color/colorTextMain"
-        android:textColorHint="@color/colorTextHidden"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonNext"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGetCode"
-        app:layout_constraintVertical_bias="0.12" />
-
-    <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
@@ -60,6 +41,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView5"
         app:layout_constraintVertical_bias="0.111" />
+
+    <EditText
+        android:id="@+id/editTextCode"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:background="@drawable/editemail"
+        android:ems="15"
+        android:hint="인증 코드"
+        android:inputType="number"
+        android:paddingLeft="15dp"
+        android:textColor="@color/colorTextMain"
+        android:textColorHint="@color/colorTextHidden"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonNext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonGetCode"
+        app:layout_constraintVertical_bias="0.12" />
 
     <TextView
         android:id="@+id/textViewNoCode"
