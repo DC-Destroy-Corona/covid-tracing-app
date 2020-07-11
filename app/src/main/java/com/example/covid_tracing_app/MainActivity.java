@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 switch(state) {
                     case BluetoothAdapter.STATE_OFF:
-                        textStatus.setText("OFF");
+                        textStatus.setText("블루투스가 켜져있지 않습니다.");
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         textStatus.setText("TUNING OFF...");
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        textStatus.setText("ON");
+                        textStatus.setText("서비스가 활성화 중입니다.");
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         textStatus.setText("TUNING ON...");
@@ -61,11 +61,12 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             if(!bluetoothAdapter.isEnabled()){
+                textStatus.setText("블루투스가 켜져있지 않습니다.");
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
             else{
-                textStatus.setText("ON");
+                textStatus.setText("서비스가 활성화 중입니다.");
             }
         }
     }
