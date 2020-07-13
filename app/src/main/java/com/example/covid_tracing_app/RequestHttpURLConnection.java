@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.Map;
 
 public class RequestHttpURLConnection {
-    public String url = "http://1.251.103.64:8888";
 
     public String request(String _url, ContentValues _params, String _method) {
 
