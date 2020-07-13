@@ -1,6 +1,8 @@
 package com.example.covid_tracing_app;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -21,6 +24,8 @@ public class SignupActivity_B extends AppCompatActivity {
     Button btnCheckCode;
     Button btnNext;
     TextView textNoCode;
+
+    private String url = "http://1.251.103.64:8888/user/sign-up/email";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,14 @@ public class SignupActivity_B extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    //서버로 인증코드 요청 후 반환
+                    String email = editEmail.getText().toString().trim();
+
+                    /* DB 대조 */
+                    ContentValues values = new ContentValues();
+                    values.put("email", email);
+
+                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    networkTask.execute();//서버로 인증코드 요청 후 반환
                 }catch (Exception e){
                     e.printStackTrace();
                     throw e;
@@ -87,6 +99,14 @@ public class SignupActivity_B extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    String code = editCode.getText().toString().trim();
+
+                    /* DB 대조 */
+                    ContentValues values = new ContentValues();
+                    values.put("code", code);
+
+                    NetworkTask networkTask = new NetworkTask(url+"-check", values, "GET");
+                    networkTask.execute();//서버로 인증코드 요청 후 반환
                     //서버와 입력한 인증코드 비교
                 }catch (Exception e){
                     e.printStackTrace();
@@ -134,4 +154,39 @@ public class SignupActivity_B extends AppCompatActivity {
             }
         });
     }
+
+    public class NetworkTask extends AsyncTask<Void, Void, String> {
+
+        String url;
+        ContentValues values;
+        String method;
+
+        NetworkTask(String url, ContentValues values, String method){
+            this.url = url;
+            this.values = values;
+            this.method = method;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values, method);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다.
+            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+        }
+    }
+
 }
