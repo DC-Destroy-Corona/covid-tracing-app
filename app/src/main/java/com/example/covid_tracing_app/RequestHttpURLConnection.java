@@ -1,6 +1,7 @@
 package com.example.covid_tracing_app;
 
 import android.content.ContentValues;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,8 +101,8 @@ public class RequestHttpURLConnection {
 
             // [2-3]. 연결 요청 확인.
             // 실패 시 null을 리턴하고 메서드를 종료.
-            if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK)
-                return null;
+            //if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK)
+            //    return null;
 
             // [2-4]. 읽어온 결과물 리턴.
             // 요청한 URL의 출력물을 BufferedReader로 받는다.
@@ -115,6 +116,14 @@ public class RequestHttpURLConnection {
             while ((line = reader.readLine()) != null) {
                 page += line;
             }
+
+            try {
+                JSONObject jsonObject = new JSONObject(page);
+                page = jsonObject.getString("msg");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             return page;
 
         } catch (MalformedURLException e) { // for URL.
