@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 public class SignupActivity_C extends AppCompatActivity {
@@ -31,7 +33,7 @@ public class SignupActivity_C extends AppCompatActivity {
     private boolean isPhoneEnable = false;
 
     private String url = "http://1.251.103.64:8888/user/sign-up";
-
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,15 +206,23 @@ public class SignupActivity_C extends AppCompatActivity {
                 String birth = editBirth.getText().toString().trim();
                 String phone = editPhone.getText().toString().trim();
 
-                /* DB 대조 */
-                ContentValues values = new ContentValues();
-                values.put("password", password);
-                values.put("name", name);
-                values.put("birth", birth);
-                values.put("phone", phone);
+                try {
+                    /* DB 대조 */
+                    JSONObject values = new JSONObject();
+                    values.put("email", "");
+                    values.put("password", password);
+                    values.put("name", name);
+                    values.put("birthday", birth);
+                    values.put("phone", phone);
 
-                NetworkTask networkTask = new NetworkTask(url, values, "POST");
-                networkTask.execute();//서버로 인증코드 요청 후 반환
+                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    networkTask.execute();//서버로 인증코드 요청 후 반환
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                } finally {
+
+                }
 
                 Intent intent = new Intent(SignupActivity_C.this, SignupActivity_D.class);
                 startActivity(intent);
@@ -226,10 +236,10 @@ public class SignupActivity_C extends AppCompatActivity {
     public class NetworkTask extends AsyncTask<Void, Void, String> {
 
         String url;
-        ContentValues values;
+        JSONObject values;
         String method;
 
-        NetworkTask(String url, ContentValues values, String method){
+        NetworkTask(String url, JSONObject values, String method){
             this.url = url;
             this.values = values;
             this.method = method;

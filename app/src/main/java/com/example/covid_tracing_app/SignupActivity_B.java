@@ -15,6 +15,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 public class SignupActivity_B extends AppCompatActivity {
@@ -26,6 +29,7 @@ public class SignupActivity_B extends AppCompatActivity {
     TextView textNoCode;
 
     private String url = "http://1.251.103.64:8888/user/sign-up/email";
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,15 +79,14 @@ public class SignupActivity_B extends AppCompatActivity {
                     String email = editEmail.getText().toString().trim();
 
                     /* DB 대조 */
-                    ContentValues values = new ContentValues();
+                    JSONObject values = new JSONObject();
                     values.put("email", email);
 
                     NetworkTask networkTask = new NetworkTask(url, values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
-                }catch (Exception e){
+                }catch (JSONException e){
                     e.printStackTrace();
-                    throw e;
-                    //실패 시
+                    throw new RuntimeException(e);
                 }finally {
                     btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this, R.drawable.btnlogindisable));
                     btnGetCode.setEnabled(false);
@@ -102,15 +105,15 @@ public class SignupActivity_B extends AppCompatActivity {
                     String code = editCode.getText().toString().trim();
 
                     /* DB 대조 */
-                    ContentValues values = new ContentValues();
-                    values.put("code", code);
+                    JSONObject values = new JSONObject();
+                    values.put("authKey", code);
 
                     NetworkTask networkTask = new NetworkTask(url+"-check", values, "GET");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
                     //서버와 입력한 인증코드 비교
-                }catch (Exception e){
+                }catch (JSONException e){
                     e.printStackTrace();
-                    throw e;
+                    throw new RuntimeException(e);
                     //실패 시
                 }finally {
                     editEmail.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.editdisable));
@@ -158,10 +161,10 @@ public class SignupActivity_B extends AppCompatActivity {
     public class NetworkTask extends AsyncTask<Void, Void, String> {
 
         String url;
-        ContentValues values;
+        JSONObject values;
         String method;
 
-        NetworkTask(String url, ContentValues values, String method){
+        NetworkTask(String url, JSONObject values, String method){
             this.url = url;
             this.values = values;
             this.method = method;

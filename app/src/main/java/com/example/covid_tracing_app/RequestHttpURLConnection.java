@@ -2,6 +2,9 @@ package com.example.covid_tracing_app;
 
 import android.content.ContentValues;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,16 +17,18 @@ import java.util.Map;
 
 public class RequestHttpURLConnection {
 
-    public String request(String _url, ContentValues _params, String _method) {
+    public String request(String _url, JSONObject _params, String _method){
 
         HttpURLConnection urlConn = null;
 
         // URL 뒤에 붙여서 보낼 파라미터.
-        StringBuffer sbParams = new StringBuffer();
+        //StringBuffer sbParams = new StringBuffer();
 
         /**
          * 1. StringBuffer에 파라미터 연결
          * */
+
+        /*
         // 보낼 데이터가 없으면 파라미터를 비운다.
         if (_params == null)
             sbParams.append("");
@@ -51,6 +56,9 @@ public class RequestHttpURLConnection {
                         isAnd = true;
             }
         }
+        */
+
+
 
         /**
          * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
@@ -71,11 +79,22 @@ public class RequestHttpURLConnection {
             urlConn.setDoInput(true);
             urlConn.setRequestProperty("Accept-Charset", "utf-8"); // Accept-Charset 설정.
             //urlConn.setRequestProperty("Context_Type", "application/x-www-form-urlencoded");
-            urlConn.setRequestProperty("Context_Type", "application/json");
+            urlConn.setRequestProperty("Content-Type", "application/json");
 
             // [2-2]. parameter 전달 및 데이터 읽어오기.
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
-            pw.write(sbParams.toString());
+            pw.println(_params);
+
+            /*
+            //JSON으로 변경
+            try {
+                JSONObject jsonObject = new JSONObject(sbParams.toString());
+                pw.println(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                pw.println("{\"wtf\":\"wtf\"}");
+            }*/
+
             pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
             pw.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
 

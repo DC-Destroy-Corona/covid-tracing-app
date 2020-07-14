@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class LoginActivity extends AppCompatActivity {
     EditText editEmail;
     EditText editPassword;
@@ -23,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isPasswordEnable = false;
 
     private String url = "http://1.251.103.64:8888/user/login";
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,13 +106,20 @@ public class LoginActivity extends AppCompatActivity {
                 String id = editEmail.getText().toString().trim();
                 String password = editPassword.getText().toString();
 
-                /* DB 대조 */
-                ContentValues values = new ContentValues();
-                values.put("id", id);
-                values.put("password", password);
+                try {
+                    /* DB 대조 */
+                    JSONObject values = new JSONObject();
+                    values.put("id", id);
+                    values.put("password", password);
 
-                NetworkTask networkTask = new NetworkTask(url, values, "POST");
-                networkTask.execute();//서버로 인증코드 요청 후 반환
+                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    networkTask.execute();//서버로 인증코드 요청 후 반환
+                } catch (JSONException e){
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                } finally {
+
+                }
 
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -134,10 +145,10 @@ public class LoginActivity extends AppCompatActivity {
     public class NetworkTask extends AsyncTask<Void, Void, String> {
 
         String url;
-        ContentValues values;
+        JSONObject values;
         String method;
 
-        NetworkTask(String url, ContentValues values, String method){
+        NetworkTask(String url, JSONObject values, String method){
             this.url = url;
             this.values = values;
             this.method = method;
