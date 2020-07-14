@@ -28,8 +28,8 @@ public class SignupActivity_B extends AppCompatActivity {
     Button btnNext;
     TextView textNoCode;
 
-    private String url = "http://1.251.103.64:8888/user/sign-up/email";
-    //private String url = "http://180.189.121.112:63000";
+    //private String url = "http://1.251.103.64:8888";
+    private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class SignupActivity_B extends AppCompatActivity {
                     JSONObject values = new JSONObject();
                     values.put("email", email);
 
-                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    NetworkTask networkTask = new NetworkTask(url+"/user/sign-up/email", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
                 }catch (JSONException e){
                     e.printStackTrace();
@@ -102,13 +102,15 @@ public class SignupActivity_B extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    String email = editEmail.getText().toString().trim();
                     String code = editCode.getText().toString().trim();
 
                     /* DB 대조 */
                     JSONObject values = new JSONObject();
+                    values.put("email", email);
                     values.put("authKey", code);
 
-                    NetworkTask networkTask = new NetworkTask(url+"-check", values, "GET");
+                    NetworkTask networkTask = new NetworkTask(url+"/user/sign-up/check-email", values, "GET");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
                     //서버와 입력한 인증코드 비교
                 }catch (JSONException e){

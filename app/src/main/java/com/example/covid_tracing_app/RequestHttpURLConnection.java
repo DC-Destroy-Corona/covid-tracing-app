@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -71,38 +72,27 @@ public class RequestHttpURLConnection {
             // [2-1]. urlConn 설정.
             urlConn.setReadTimeout(10000);
             urlConn.setConnectTimeout(15000);
-            if(_method == "GET"){
-                urlConn.setRequestMethod("GET");
-            }else{
-                urlConn.setRequestMethod("POST");
-            }
+            urlConn.setRequestMethod(_method);
             urlConn.setDoOutput(true);
             urlConn.setDoInput(true);
             urlConn.setRequestProperty("Accept-Charset", "utf-8"); // Accept-Charset 설정.
-            //urlConn.setRequestProperty("Context_Type", "application/x-www-form-urlencoded");
             urlConn.setRequestProperty("Content-Type", "application/json");
-
             // [2-2]. parameter 전달 및 데이터 읽어오기.
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
-            pw.println(_params);
 
-            /*
-            //JSON으로 변경
-            try {
-                JSONObject jsonObject = new JSONObject(sbParams.toString());
-                pw.println(jsonObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                pw.println("{\"wtf\":\"wtf\"}");
-            }*/
-
-            pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
-            pw.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
+            if(_method=="GET"){
+            }else {
+                PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
+                pw.println(_params);
+                pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
+                pw.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
+            }
 
             // [2-3]. 연결 요청 확인.
             // 실패 시 null을 리턴하고 메서드를 종료.
             //if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK)
             //    return null;
+
+            String tmp = urlConn.getRequestMethod();
 
             // [2-4]. 읽어온 결과물 리턴.
             // 요청한 URL의 출력물을 BufferedReader로 받는다.
@@ -124,7 +114,7 @@ public class RequestHttpURLConnection {
                 e.printStackTrace();
             }
 
-            return page;
+            return tmp+_method+page;
 
         } catch (MalformedURLException e) { // for URL.
             e.printStackTrace();
