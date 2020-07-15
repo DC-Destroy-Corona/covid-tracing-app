@@ -25,7 +25,8 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isEmailEnable = false;
     private boolean isPasswordEnable = false;
 
-    private String url = "http://1.251.103.64:8888/user/login";
+    private String url = "http://203.250.32.29:80/user/login";
+    //private String url = "http://1.251.103.64:8888/user/login";
     //private String url = "http://180.189.121.112:63000";
 
     @Override

@@ -32,7 +32,8 @@ public class SignupActivity_C extends AppCompatActivity {
     private boolean isBirthEnable = false;
     private boolean isPhoneEnable = false;
 
-    private String url = "http://1.251.103.64:8888/user/sign-up";
+    private String url = "http://203.250.32.29:80/user/sign-up";
+    //private String url = "http://1.251.103.64:8888/user/sign-up";
     //private String url = "http://180.189.121.112:63000";
 
     @Override

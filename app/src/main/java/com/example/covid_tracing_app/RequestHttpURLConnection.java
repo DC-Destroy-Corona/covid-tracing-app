@@ -3,6 +3,7 @@ package com.example.covid_tracing_app;
 import android.content.ContentValues;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,6 +16,10 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class RequestHttpURLConnection {
@@ -23,40 +28,80 @@ public class RequestHttpURLConnection {
 
         HttpURLConnection urlConn = null;
 
-        // URL 뒤에 붙여서 보낼 파라미터.
-        //StringBuffer sbParams = new StringBuffer();
-
         /**
          * 1. StringBuffer에 파라미터 연결
          * */
-
         /*
+        // URL 뒤에 붙여서 보낼 파라미터.
+        StringBuffer sbParams = new StringBuffer();
+
         // 보낼 데이터가 없으면 파라미터를 비운다.
         if (_params == null)
             sbParams.append("");
             // 보낼 데이터가 있으면 파라미터를 채운다.
         else {
-            // 파라미터가 2개 이상이면 파라미터 연결에 &가 필요하므로 스위칭할 변수 생성.
-            boolean isAnd = false;
-            // 파라미터 키와 값.
-            String key;
-            String value;
-
-            for (Map.Entry<String, Object> parameter : _params.valueSet()) {
-                key = parameter.getKey();
-                value = parameter.getValue().toString();
-
-                // 파라미터가 두개 이상일때, 파라미터 사이에 &를 붙인다.
-                if (isAnd)
-                    sbParams.append("&");
-
-                sbParams.append(key).append("=").append(value);
-
-                // 파라미터가 2개 이상이면 isAnd를 true로 바꾸고 다음 루프부터 &를 붙인다.
-                if (!isAnd)
-                    if (_params.size() >= 2)
-                        isAnd = true;
+            String param = _params.toString();
+            JSONArray jsonArray = null;
+            try {
+                jsonArray = new JSONArray(param);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
+            ArrayList<Object> keyList = new ArrayList<Object>();
+            JSONArray order = null;
+
+            try {
+                order = jsonArray.getJSONArray(0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            for (int i = 0; i < _params.length(); i++) {
+                //key 취득
+                Iterator<String> keys = null;
+                try {
+                    keys = order.getJSONObject(i).keys();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //key를 리스트에 저장
+                do {
+                    String key = String.valueOf(keys.next());
+                    keyList.add(key);
+                } while (keys.hasNext());
+
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = order.getJSONObject(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                boolean isAnd = false;
+                // 파라미터 키와 값.
+                for (int j = 0; j < keyList.size(); j++) {
+                    String strKey = keyList.get(j).toString();
+                    String value = null;
+                    try {
+                        value = jsonObject.getString(strKey);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (isAnd)
+                        sbParams.append("&");
+
+                    sbParams.append(strKey).append("=").append(value);
+
+                    // 파라미터가 2개 이상이면 isAnd를 true로 바꾸고 다음 루프부터 &를 붙인다.
+                    if (!isAnd)
+                        if (keyList.size() >= 2)
+                            isAnd = true;
+                }
+            }
+
         }
         */
 
@@ -66,7 +111,13 @@ public class RequestHttpURLConnection {
          * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
          * */
         try {
-            URL url = new URL(_url);
+            String requrl = _url;
+            /*
+            if (_method=="GET"){
+                requrl=requrl+"?"+sbParams;
+            }
+            */
+            URL url = new URL(requrl);
             urlConn = (HttpURLConnection) url.openConnection();
 
             // [2-1]. urlConn 설정.
@@ -79,8 +130,7 @@ public class RequestHttpURLConnection {
             urlConn.setRequestProperty("Content-Type", "application/json");
             // [2-2]. parameter 전달 및 데이터 읽어오기.
 
-            if(_method=="GET"){
-            }else {
+            if(_method=="POST"){
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
                 pw.println(_params);
                 pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
@@ -126,4 +176,5 @@ public class RequestHttpURLConnection {
         }
         return null;
     }
+
 }
