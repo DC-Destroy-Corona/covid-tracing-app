@@ -121,7 +121,7 @@ public class RequestHttpURLConnection {
             urlConn = (HttpURLConnection) url.openConnection();
 
             // [2-1]. urlConn 설정.
-            urlConn.setReadTimeout(10000);
+            urlConn.setReadTimeout(20000);
             urlConn.setConnectTimeout(15000);
             urlConn.setRequestMethod(_method);
             urlConn.setDoOutput(true);
@@ -142,15 +142,24 @@ public class RequestHttpURLConnection {
             //if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK)
             //    return null;
 
-            String tmp = urlConn.getRequestMethod();
-
             // [2-4]. 읽어온 결과물 리턴.
             // 요청한 URL의 출력물을 BufferedReader로 받는다.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF-8"));
+
+            int status = 0;
+            BufferedReader reader = null;
+            try{
+                status = urlConn.getResponseCode();
+                reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF-8"));
+            } catch (IOException e){
+                e.printStackTrace();
+                return status+"Response Error";
+            }
+
 
             // 출력물의 라인과 그 합에 대한 변수.
             String line;
             String page = "";
+
 
             // 라인을 받아와 합친다.
             while ((line = reader.readLine()) != null) {
@@ -164,7 +173,7 @@ public class RequestHttpURLConnection {
                 e.printStackTrace();
             }
 
-            return tmp+_method+page;
+            return (Integer.toString(status))+"_"+page;
 
         } catch (MalformedURLException e) { // for URL.
             e.printStackTrace();

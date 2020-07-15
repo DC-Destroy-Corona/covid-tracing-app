@@ -210,10 +210,10 @@ public class SignupActivity_C extends AppCompatActivity {
                 try {
                     /* DB 대조 */
                     JSONObject values = new JSONObject();
-                    values.put("email", "");
+                    values.put("email", "uuhh5417@gmail.com");
                     values.put("password", password);
                     values.put("name", name);
-                    values.put("birthday", birth);
+                    values.put("birthdate", birth);
                     values.put("phone", phone);
 
                     NetworkTask networkTask = new NetworkTask(url, values, "POST");
@@ -225,11 +225,7 @@ public class SignupActivity_C extends AppCompatActivity {
 
                 }
 
-                Intent intent = new Intent(SignupActivity_C.this, SignupActivity_D.class);
-                startActivity(intent);
 
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                finish();
             }
         });
     }
@@ -264,7 +260,17 @@ public class SignupActivity_C extends AppCompatActivity {
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            if(result.contains("201")){
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(SignupActivity_C.this, SignupActivity_D.class);
+                startActivity(intent);
+
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                finish();
+            } else{
+                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+
+            }
         }
     }
 
