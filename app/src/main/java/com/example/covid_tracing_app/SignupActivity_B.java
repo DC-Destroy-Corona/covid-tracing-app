@@ -28,9 +28,10 @@ public class SignupActivity_B extends AppCompatActivity {
     Button btnNext;
     TextView textNoCode;
 
-    private String url = "http://203.250.32.29:80";
+    private int requestcode = 0;
+    //private String url = "http://203.250.32.29:80";
     //private String url = "http://1.251.103.64:8888";
-    //private String url = "http://180.189.121.112:63000";
+    private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,9 @@ public class SignupActivity_B extends AppCompatActivity {
                     NetworkTask networkTask = new NetworkTask(url+"/user/sign-up/email", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
 
+                    requestcode = 201;
+                    btnGetCode.setEnabled(false);
+                    btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogindisable));
                 }catch (JSONException e){
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -110,7 +114,9 @@ public class SignupActivity_B extends AppCompatActivity {
                     NetworkTask networkTask = new NetworkTask(url+"/user/sign-up/check-email", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
 
-
+                    requestcode = 200;
+                    btnCheckCode.setEnabled(false);
+                    btnCheckCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogindisable));
                 }catch (JSONException e){
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -135,7 +141,12 @@ public class SignupActivity_B extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String email = editEmail.getText().toString().trim();
+
                 Intent intent = new Intent(SignupActivity_B.this, SignupActivity_C.class);
+
+                intent.putExtra("email", email);
+
                 startActivity(intent);
 
                 overridePendingTransition(R.anim.fadein,R.anim.fadeout);
@@ -174,7 +185,6 @@ public class SignupActivity_B extends AppCompatActivity {
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
-            //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if(result.contains("201")){
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
                 btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this, R.drawable.btnlogindisable));
@@ -200,8 +210,14 @@ public class SignupActivity_B extends AppCompatActivity {
                 btnNext.setBackground(ContextCompat.getDrawable(SignupActivity_B.this, R.drawable.btnsignup));
                 btnNext.setEnabled(true);
             }else{
+                if(requestcode==201){
+                    btnGetCode.setEnabled(true);
+                    btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogin));
+                }else if(requestcode==200){
+                    btnCheckCode.setEnabled(true);
+                    btnCheckCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogin));
+                }
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
-
             }
         }
     }

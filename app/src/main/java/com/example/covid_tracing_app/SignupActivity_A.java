@@ -6,11 +6,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 public class SignupActivity_A extends AppCompatActivity {
+    TextView textAgree;
     CheckBox checkAgree;
     Button btnNext;
 
@@ -19,6 +21,7 @@ public class SignupActivity_A extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_a);
 
+        textAgree = (TextView)findViewById(R.id.textViewAgree);
         checkAgree = (CheckBox)findViewById(R.id.checkBoxAgree);
         btnNext = (Button)findViewById(R.id.buttonNext);
     }
@@ -26,6 +29,18 @@ public class SignupActivity_A extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        textAgree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkAgree.isChecked()) {
+                    checkAgree.setChecked(false);
+                }
+                else {
+                    checkAgree.setChecked(true);
+                }
+            }
+        });
 
         checkAgree.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

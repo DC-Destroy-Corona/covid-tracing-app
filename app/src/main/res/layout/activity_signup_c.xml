@@ -37,16 +37,14 @@
         app:layout_constraintVertical_bias="0.075" />
 
     <EditText
-        android:id="@+id/editTextEmail5"
+        android:id="@+id/editTextID"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:background="@drawable/editdisable"
-        android:clickable="false"
-        android:editable="false"
         android:ems="15"
         android:enabled="false"
-        android:hint="uuhh5417@gmail.com"
-        android:inputType="textEmailAddress"
+        android:hint="ID"
+        android:inputType="text"
         android:paddingLeft="15dp"
         android:textColor="@color/colorTextMain"
         android:textColorHint="@color/colorTextHidden"
@@ -92,7 +90,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail5"
+        app:layout_constraintTop_toBottomOf="@+id/editTextID"
         app:layout_constraintVertical_bias="0.09" />
 
     <EditText
