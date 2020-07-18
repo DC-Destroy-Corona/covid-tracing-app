@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 public class SignupActivity_C extends AppCompatActivity {
+    EditText editID;
     EditText editPassword;
     EditText editConfirm;
     EditText editName;
@@ -26,21 +27,27 @@ public class SignupActivity_C extends AppCompatActivity {
     EditText editPhone;
     Button btnNext;
 
+    String ID = "";
+
     private boolean isPasswordEnable = false;
     private boolean isConfirmEnable = false;
     private boolean isNameEnable = false;
     private boolean isBirthEnable = false;
     private boolean isPhoneEnable = false;
 
-    private String url = "http://203.250.32.29:80/user/sign-up";
-    //private String url = "http://1.251.103.64:8888/user/sign-up";
-    //private String url = "http://180.189.121.112:63000";
+    private String pass = "";
+    private String confirm = "";
+
+    //private String url = "http://203.250.32.29:80";
+    //private String url = "http://1.251.103.64:8888";
+    private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_c);
 
+        editID = (EditText)findViewById(R.id.editTextID);
         editPassword = (EditText)findViewById(R.id.editTextPassword);
         editConfirm = (EditText)findViewById(R.id.editTextConfirm);
         editName = (EditText)findViewById(R.id.editTextName);
@@ -54,6 +61,18 @@ public class SignupActivity_C extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Intent intent = getIntent();
+        ID = intent.getExtras().getString("email");
+
+        if(ID!=""){
+            editID.setText(ID);
+            editID.setTextColor(ContextCompat.getColor(SignupActivity_C.this,R.color.colorTextHidden));
+            editID.setEnabled(false);
+            editID.setClickable(false);
+        }else{
+            Toast.makeText(getApplicationContext(),"Loading Error", Toast.LENGTH_SHORT).show();
+        }
+
         editPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -62,12 +81,7 @@ public class SignupActivity_C extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length()>=8){
-                    isPasswordEnable = true;
-                }
-                else{
-                    isPasswordEnable = false;
-                }
+
             }
 
             @Override
@@ -210,7 +224,7 @@ public class SignupActivity_C extends AppCompatActivity {
                 try {
                     /* DB 대조 */
                     JSONObject values = new JSONObject();
-                    values.put("email", "uuhh5417@gmail.com");
+                    values.put("email", ID);
                     values.put("password", password);
                     values.put("name", name);
                     values.put("birthdate", birth);

@@ -130,11 +130,20 @@ public class RequestHttpURLConnection {
             urlConn.setRequestProperty("Content-Type", "application/json");
             // [2-2]. parameter 전달 및 데이터 읽어오기.
 
+            int status = 0;
+
             if(_method=="POST"){
-                PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
-                pw.println(_params);
-                pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
-                pw.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
+                try{
+                    PrintWriter pw = new PrintWriter(new OutputStreamWriter(urlConn.getOutputStream()));
+                    pw.println(_params);
+                    //pw.print("test");
+                    pw.flush(); // 출력 스트림을 flush. 버퍼링 된 모든 출력 바이트를 강제 실행.
+                    pw.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
+                    status = urlConn.getResponseCode();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return status+"_Request Error";
+                }
             }
 
             // [2-3]. 연결 요청 확인.
@@ -145,14 +154,13 @@ public class RequestHttpURLConnection {
             // [2-4]. 읽어온 결과물 리턴.
             // 요청한 URL의 출력물을 BufferedReader로 받는다.
 
-            int status = 0;
             BufferedReader reader = null;
             try{
                 status = urlConn.getResponseCode();
                 reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF-8"));
             } catch (IOException e){
                 e.printStackTrace();
-                return status+"Response Error";
+                return status+"_Response Error";
             }
 
 

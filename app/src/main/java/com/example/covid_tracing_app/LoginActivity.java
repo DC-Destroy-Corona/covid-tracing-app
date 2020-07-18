@@ -25,9 +25,9 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isEmailEnable = false;
     private boolean isPasswordEnable = false;
 
-    private String url = "http://203.250.32.29:80/user/login";
-    //private String url = "http://1.251.103.64:8888/user/login";
-    //private String url = "http://180.189.121.112:63000";
+    //private String url = "http://203.250.32.29:80";
+    //private String url = "http://1.251.103.64:8888";
+    private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                     values.put("email", id);
                     values.put("password", password);
 
-                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    NetworkTask networkTask = new NetworkTask(url+"/user/login", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
                 } catch (JSONException e){
                     e.printStackTrace();
