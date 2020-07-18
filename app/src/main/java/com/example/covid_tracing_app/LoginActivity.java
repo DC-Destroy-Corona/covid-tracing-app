@@ -171,14 +171,12 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
             if(result.contains("201")){
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }else{
-                Toast.makeText(getApplicationContext(),result+result,Toast.LENGTH_LONG).show();
-
+                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
             }
         }
     }

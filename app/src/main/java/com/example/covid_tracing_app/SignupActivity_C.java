@@ -86,6 +86,17 @@ public class SignupActivity_C extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                pass = String.valueOf(editPassword.getText());
+
+                if(pass.equals(confirm)){
+                    editConfirm.setBackground(ContextCompat.getDrawable(SignupActivity_C.this,R.drawable.editpassowrd));
+                    isPasswordEnable = true;
+                }
+                else{
+                    editConfirm.setBackground(ContextCompat.getDrawable(SignupActivity_C.this,R.drawable.editerror));
+                    isPasswordEnable = false;
+                }
+
                 if(isPasswordEnable&&isConfirmEnable&&isNameEnable&&isBirthEnable&&isPhoneEnable){
                     btnNext.setBackground(ContextCompat.getDrawable(SignupActivity_C.this, R.drawable.btnsignup));
                     btnNext.setEnabled(true);
@@ -105,6 +116,7 @@ public class SignupActivity_C extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
                 if(s.length()>=8){
                     isConfirmEnable = true;
                 }
@@ -115,6 +127,17 @@ public class SignupActivity_C extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                confirm = String.valueOf(editConfirm.getText());
+
+                if(pass.equals(confirm)){
+                    editConfirm.setBackground(ContextCompat.getDrawable(SignupActivity_C.this,R.drawable.editpassowrd));
+                    isPasswordEnable = true;
+                }
+                else{
+                    editConfirm.setBackground(ContextCompat.getDrawable(SignupActivity_C.this,R.drawable.editerror));
+                    isPasswordEnable = false;
+                }
+
                 if(isPasswordEnable&&isConfirmEnable&&isNameEnable&&isBirthEnable&&isPhoneEnable){
                     btnNext.setBackground(ContextCompat.getDrawable(SignupActivity_C.this, R.drawable.btnsignup));
                     btnNext.setEnabled(true);
@@ -230,7 +253,7 @@ public class SignupActivity_C extends AppCompatActivity {
                     values.put("birthdate", birth);
                     values.put("phone", phone);
 
-                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    NetworkTask networkTask = new NetworkTask(url+"/user/sign-up", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
                 } catch (JSONException e) {
                     e.printStackTrace();

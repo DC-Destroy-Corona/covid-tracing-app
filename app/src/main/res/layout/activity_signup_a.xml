@@ -107,6 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="left|end"
+                android:clickable="true"
                 android:gravity="center_vertical"
                 android:text="개인정보 수집 및 이용 동의"
                 android:textColor="@color/colorTextMain" />
