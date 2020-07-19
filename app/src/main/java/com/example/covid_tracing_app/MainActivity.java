@@ -10,23 +10,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.Region;
-
-public class MainActivity extends AppCompatActivity implements BeaconConsumer{
+public class MainActivity extends AppCompatActivity{
     int REQUEST_ENABLE_BT = 420;
     TextView textStatus;
-    TextView textValue;
     BluetoothAdapter bluetoothAdapter;
-
-    protected static final String TAG = "MonitoringActivity";
-    private BeaconManager beaconManager;
 
     private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
         @Override
@@ -60,16 +51,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer{
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         textStatus = (TextView)findViewById(R.id.textViewStatus);
-        textValue = (TextView)findViewById(R.id.textViewValue);
 
         IntentFilter btFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(broadcastReceiver, btFilter);
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-
-        // ibeacon layout
-        beaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.bind(this);
     }
 
     @Override
@@ -89,28 +73,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer{
                 textStatus.setText("서비스가 활성화 중입니다.");
             }
         }
-    }
 
-    public void onBeaconServiceConnect() {
-        beaconManager.addMonitorNotifier(new MonitorNotifier() {
+        textStatus.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void didEnterRegion(Region region) {
-                Log.i(TAG, "I just saw an beacon for the first time!");
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-                Log.i(TAG, "I no longer see an beacon");
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int state, Region region) {
-                Log.i(TAG, "I have just switched from seeing/not seeing beacons: "+state);
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,BeaconActivity.class);
+                startActivity(intent);
             }
         });
-
-        try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
-        } catch (RemoteException ignored) {    }
     }
 }
