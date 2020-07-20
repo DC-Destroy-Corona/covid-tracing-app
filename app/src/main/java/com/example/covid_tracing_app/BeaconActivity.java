@@ -1,6 +1,7 @@
 package com.example.covid_tracing_app;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -37,16 +38,21 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
     Button button;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private static final String TAG = "sampleCreateBeacon";
+    private static final String TAG = "BeaconActivity";
 
     private BeaconManager beaconManager;
     // 감지된 비콘들을 임시로 담을 리스트
     private List<Beacon> beaconList = new ArrayList<>();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
 
         textValue = (TextView)findViewById(R.id.textViewValue);
         button = (Button)findViewById(R.id.button);
@@ -56,7 +62,7 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
 
         // 여기가 중요한데, 기기에 따라서 setBeaconLayout 안의 내용을 바꿔줘야 하는듯 싶다.
         // 필자의 경우에는 아래처럼 하니 잘 동작했음.
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
 
         // 비콘 탐지를 시작한다. 실제로는 서비스를 시작하는것.
         beaconManager.bind(this);
@@ -82,7 +88,26 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
 
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.removeAllMonitorNotifiers();
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            // 비콘이 감지되면 해당 함수가 호출된다. Collection<Beacon> beacons에는 감지된 비콘의 리스트가,
+            // region에는 비콘들에 대응하는 Region 객체가 들어온다.
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
+                    Log.i(TAG, "The first beacon I see is about "+beacons.iterator().next().getDistance()+" meters away.");
+                    beaconList.clear();
+                    for (Beacon beacon : beacons) {
+                        beaconList.add(beacon);
+                    }
+                }
+            }
+        });
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) { //이 엔터를 타야만 비콘검색가능
@@ -99,26 +124,11 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
                 textValue.setText("... \n");
             }
         });
-
-        beaconManager.removeAllRangeNotifiers();
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            // 비콘이 감지되면 해당 함수가 호출된다. Collection<Beacon> beacons에는 감지된 비콘의 리스트가,
-            // region에는 비콘들에 대응하는 Region 객체가 들어온다.
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    Log.i(TAG, "The first beacon I see is about "+beacons.iterator().next().getDistance()+" meters away.");
-                    beaconList.clear();
-                    for (Beacon beacon : beacons) {
-                        beaconList.add(beacon);
-                    }
-                }
-            }
-        });
-
         try {
-            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {    }
+            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     Handler handler = new Handler() {
