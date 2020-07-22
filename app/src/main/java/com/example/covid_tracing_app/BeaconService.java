@@ -1,45 +1,36 @@
 package com.example.covid_tracing_app;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
-import android.app.AlertDialog;
-import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseSettings;
-import android.content.DialogInterface;
+import android.app.Activity;
+import android.app.Service;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ServiceCompat;
+import androidx.core.content.ContextCompat;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.BeaconTransmitter;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class BeaconActivity extends AppCompatActivity implements BeaconConsumer {
-    TextView textValue;
-    Button button;
-
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private static final String TAG = "BeaconActivity";
+public class BeaconService extends Service implements BeaconConsumer {
+    private static final String TAG = "BeaconService";
 
     private BeaconManager beaconManager;
     // 감지된 비콘들을 임시로 담을 리스트
@@ -48,18 +39,8 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
     private boolean sw = true;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_beacon);
-
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-
-        textValue = (TextView)findViewById(R.id.textViewValue);
-        button = (Button)findViewById(R.id.button);
-
-        // 실제로 비콘을 탐지하기 위한 비콘매니저 객체를 초기화
+    public void onCreate() {
+        super.onCreate();
         beaconManager = BeaconManager.getInstanceForApplication(this);
 
         // 여기가 중요한데, 기기에 따라서 setBeaconLayout 안의 내용을 바꿔줘야 하는듯 싶다.
@@ -68,24 +49,31 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
 
         // 비콘 탐지를 시작한다. 실제로는 서비스를 시작하는것.
         beaconManager.bind(this);
+        handler.sendEmptyMessage(0);
+        Log.d(TAG, "onCreate() called");
+
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand() called");
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handler.sendEmptyMessage(0);
-            }
-        });
+        if (intent == null) {
+            return Service.START_STICKY;
+        } else {
+            String command = intent.getStringExtra("command");
+            String name = intent.getStringExtra("name");
+
+            Log.d(TAG, "data: " + command+ ", " +name);
+        }
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
+    @Nullable
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        beaconManager.unbind(this);
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -100,7 +88,6 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
                     beaconList.clear();
                     for (Beacon beacon : beacons) {
                         beaconList.add(beacon);
-                        //Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " + Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -110,25 +97,26 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) { //이 엔터를 타야만 비콘검색가능
-                //sw = true;
-                textValue.setText("진입 \n");
-                //handler.sendEmptyMessage(0);
+                Log.i(TAG, "I just saw an beacon for the first time!");
+                sw = true;
+                Toast.makeText(getApplicationContext(),"EnterRegion",Toast.LENGTH_SHORT);
+                handler.sendEmptyMessage(0);
             }
 
             @Override
             public void didExitRegion(Region region) {
-                //sw = false;
-                textValue.setText("탈출 \n");
+                Log.i(TAG, "I no longer see an beacon");
+                sw = false;
+                Toast.makeText(getApplicationContext(),"ExitRegion",Toast.LENGTH_SHORT);
                 //handler.removeMessages(0);
             }
 
             @Override
             public void didDetermineStateForRegion(int i, Region region) {
-                textValue.setText("... \n");
+                Log.i(TAG, "I have just switched from seeing/not seeing beacons: "+i);
             }
         });
         try {
@@ -137,23 +125,18 @@ public class BeaconActivity extends AppCompatActivity implements BeaconConsumer 
             e.printStackTrace();
         }
     }
-
     Handler handler = new Handler() {
         public void handleMessage(Message msg) {
-            textValue.setText("");
-
+            Log.i(TAG, "Handler call");
             // 비콘의 아이디와 거리를 측정하여 textView에 넣는다.
             for(Beacon beacon : beaconList){
-                textValue.append("ID : " + beacon.getId2() + " / " + "Distance : " + Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m\n");
-                Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " + Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " + Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_SHORT).show();
             }
 
             // 자기 자신을 1초마다 호출
             if(sw) {
-                handler.sendEmptyMessageDelayed(0, 3000);
+                handler.sendEmptyMessageDelayed(0, 1000);
             }
         }
     };
-
-
 }
