@@ -25,6 +25,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -137,7 +138,27 @@ public class BeaconService extends Service implements BeaconConsumer {
             Log.i(TAG, "Handler call");
             // 비콘의 아이디와 거리를 측정하여 textView에 넣는다.
             for(Beacon beacon : beaconList){
-                Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " + Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " +
+                        Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_SHORT).show();
+                try {
+                    /* DB 대조 */
+                    JSONObject values = new JSONObject();
+                    values.put("uuid", beacon.getId1());
+                    values.put("major", beacon.getId2());
+                    values.put("minor", beacon.getId3());
+                    values.put("disdance", Double.parseDouble(String.format("%.3f", beacon.getDistance())));
+                    values.put("rssi", beacon.getRssi());
+                    values.put("tx", beacon.getTxPower());
+
+
+                    NetworkTask networkTask = new NetworkTask(url, values, "POST");
+                    networkTask.execute();
+                } catch (JSONException e){
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                } finally {
+
+                }
             }
 
             // 자기 자신을 1초마다 호출
@@ -177,6 +198,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
+            Log.d(TAG, result);
         }
     }
 }
