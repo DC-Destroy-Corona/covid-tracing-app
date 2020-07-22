@@ -1,19 +1,27 @@
 package com.example.covid_tracing_app;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     int REQUEST_ENABLE_BT = 420;
     TextView textStatus;
     BluetoothAdapter bluetoothAdapter;
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
     private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
         @Override
@@ -50,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
 
         IntentFilter btFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(broadcastReceiver, btFilter);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
     }
 
     @Override
@@ -57,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         if(bluetoothAdapter == null){
-            //블루투스가 지원하지 않을 경우
+            Toast.makeText(getApplicationContext(),"Bluetooth Not Support", Toast.LENGTH_SHORT).show();//블루투스가 지원하지 않을 경우
         }
         else{
             if(!bluetoothAdapter.isEnabled()){
@@ -69,5 +81,14 @@ public class MainActivity extends AppCompatActivity {
                 textStatus.setText("서비스가 활성화 중입니다.");
             }
         }
+
+        textStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,BeaconService.class);
+                //startActivity(intent);
+                startService(intent);
+            }
+        });
     }
 }
