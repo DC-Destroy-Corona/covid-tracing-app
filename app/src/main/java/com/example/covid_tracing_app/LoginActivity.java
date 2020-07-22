@@ -22,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText editPassword;
     Button btnLogin;
     Button btnSignup;
+
     private boolean isEmailEnable = false;
     private boolean isPasswordEnable = false;
 

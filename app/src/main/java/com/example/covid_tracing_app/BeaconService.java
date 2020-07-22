@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -24,6 +25,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +39,10 @@ public class BeaconService extends Service implements BeaconConsumer {
     private List<Beacon> beaconList = new ArrayList<>();
 
     private boolean sw = true;
+
+    //private String url = "http://203.250.32.29:80";
+    //private String url = "http://1.251.103.64:8888";
+    private String url = "http://180.189.121.112:63000";
 
     @Override
     public void onCreate() {
@@ -78,6 +84,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
+        Toast.makeText(getApplicationContext(),"Start Beacon scan service", Toast.LENGTH_LONG).show();
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             // 비콘이 감지되면 해당 함수가 호출된다. Collection<Beacon> beacons에는 감지된 비콘의 리스트가,
@@ -139,4 +146,37 @@ public class BeaconService extends Service implements BeaconConsumer {
             }
         }
     };
+
+    public class NetworkTask extends AsyncTask<Void, Void, String> {
+
+        String url;
+        JSONObject values;
+        String method;
+
+        NetworkTask(String url, JSONObject values, String method){
+            this.url = url;
+            this.values = values;
+            this.method = method;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values, method);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다.
+        }
+    }
 }
