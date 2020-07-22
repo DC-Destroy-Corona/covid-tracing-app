@@ -1,6 +1,8 @@
 package com.example.covid_tracing_app;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -167,7 +169,7 @@ public class RequestHttpURLConnection {
             // 출력물의 라인과 그 합에 대한 변수.
             String line;
             String page = "";
-
+            JSONObject jtoken = new JSONObject();
 
             // 라인을 받아와 합친다.
             while ((line = reader.readLine()) != null) {
@@ -177,6 +179,10 @@ public class RequestHttpURLConnection {
             try {
                 JSONObject jsonObject = new JSONObject(page);
                 page = jsonObject.getString("msg");
+                if (!jsonObject.getString("data").isEmpty()){
+                    jtoken=jsonObject.getJSONObject("data");
+                    return (Integer.toString(status))+"_"+jtoken.toString();
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

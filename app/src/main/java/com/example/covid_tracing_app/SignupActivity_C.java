@@ -308,6 +308,22 @@ public class SignupActivity_C extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
 
             }
+
+            String data = result.substring(result.indexOf("_")+1);
+            String uid = "";
+            String token = "";
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(data);
+                uid = jsonObject.getString("userId");
+                token = jsonObject.getString("token");
+                PreferenceManager.setString(getApplicationContext(),"uid",uid);
+                PreferenceManager.setString(getApplicationContext(),"token",token);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
         }
     }
 

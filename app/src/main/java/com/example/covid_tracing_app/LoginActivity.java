@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -38,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
     //private String url = "http://1.251.103.64:8888";
     private String url = "http://180.189.121.112:63000";
 
-
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
     @Override
@@ -62,6 +63,15 @@ public class LoginActivity extends AppCompatActivity {
 
 
         foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
+
+        String pass = "";
+        pass = PreferenceManager.getString(this,"uid");
+        String token = "";
+        token = PreferenceManager.getString(this,"token");
+        if(!(pass.equals("")||token.equals(""))){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
