@@ -2,11 +2,22 @@ package com.example.covid_tracing_app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
@@ -15,6 +26,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
 import androidx.core.content.ContextCompat;
 
@@ -28,11 +40,18 @@ import org.altbeacon.beacon.Region;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class BeaconService extends Service implements BeaconConsumer {
+    public static Intent serviceIntent = null;
+
+    private Thread mainThread;
+
     private static final String TAG = "BeaconService";
 
     private BeaconManager beaconManager;
@@ -44,6 +63,9 @@ public class BeaconService extends Service implements BeaconConsumer {
     //private String url = "http://203.250.32.29:80";
     //private String url = "http://1.251.103.64:8888";
     private String url = "http://180.189.121.112:63000";
+
+    public BeaconService() {
+    }
 
     @Override
     public void onCreate() {
@@ -57,6 +79,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         // 비콘 탐지를 시작한다. 실제로는 서비스를 시작하는것.
         beaconManager.bind(this);
         handler.sendEmptyMessage(0);
+
         Log.d(TAG, "onCreate() called");
 
     }
@@ -65,22 +88,123 @@ public class BeaconService extends Service implements BeaconConsumer {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand() called");
 
-        if (intent == null) {
-            return Service.START_STICKY;
-        } else {
-            String command = intent.getStringExtra("command");
-            String name = intent.getStringExtra("name");
+        serviceIntent = intent;
+        showToast(getApplication(), "Start Service");
 
-            Log.d(TAG, "data: " + command+ ", " +name);
+        mainThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat sdf = new SimpleDateFormat("aa hh:mm");
+                boolean run = true;
+                while (run) {
+                    try {
+                        Thread.sleep(1000 * 60 * 1); // 1 minute
+                        Date date = new Date();
+                        //showToast(getApplication(), sdf.format(date));
+                        sendNotification(sdf.format(date));
+                    } catch (InterruptedException e) {
+                        run = false;
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        mainThread.start();
+
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.d(TAG, "onDestroy() called");
+
+        serviceIntent = null;
+        setAlarmTimer();
+        Thread.currentThread().interrupt();
+
+        if (mainThread != null) {
+            mainThread.interrupt();
+            mainThread = null;
         }
 
-        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+
+        Log.d(TAG, "onTaskRemoved() called");
+
+        serviceIntent = null;
+        setAlarmTimer();
+        Thread.currentThread().interrupt();
+
+        if (mainThread != null) {
+            mainThread.interrupt();
+            mainThread = null;
+        }
+    }
+
+    public void showToast(final Application application, final String msg) {
+        Handler h = new Handler(application.getMainLooper());
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(application, msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    protected void setAlarmTimer() {
+        final Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+        c.add(Calendar.SECOND, 1);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(this, 0,intent,0);
+
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), sender);
+    }
+
+    private void sendNotification(String messageBody) {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        String channelId = "fcm_default_channel";//getString(R.string.default_notification_channel_id);
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.mipmap.ic_launcher)//drawable.splash)
+                        .setContentTitle("Service test")
+                        .setContentText(messageBody)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,"Channel human readable title", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
     }
 
     @Override
@@ -112,6 +236,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                 sw = true;
                 Toast.makeText(getApplicationContext(),"EnterRegion",Toast.LENGTH_SHORT);
                 handler.sendEmptyMessage(0);
+                //init();
             }
 
             @Override
@@ -133,15 +258,13 @@ public class BeaconService extends Service implements BeaconConsumer {
             e.printStackTrace();
         }
     }
+
     Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             Log.i(TAG, "Handler call");
-            // 비콘의 아이디와 거리를 측정하여 textView에 넣는다.
+            ///비콘의 아이디와 거리를 측정하여 textView에 넣는다.
             for(Beacon beacon : beaconList){
-                Toast.makeText(getApplicationContext(),"ID : " + beacon.getId2() + " / " + "Distance : " +
-                        Double.parseDouble(String.format("%.3f", beacon.getDistance())) + "m",Toast.LENGTH_SHORT).show();
                 try {
-                    /* DB 대조 */
                     JSONObject values = new JSONObject();
                     values.put("uuid", beacon.getId1());
                     values.put("major", beacon.getId2());

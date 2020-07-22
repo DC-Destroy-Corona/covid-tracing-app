@@ -23,6 +23,8 @@ public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
     Button btnSignup;
 
+    Intent foregroundServiceIntent;
+
     private boolean isEmailEnable = false;
     private boolean isPasswordEnable = false;
 
@@ -39,11 +41,22 @@ public class LoginActivity extends AppCompatActivity {
         editPassword = (EditText)findViewById(R.id.editTextPassword);
         btnLogin = (Button)findViewById(R.id.buttonLogin);
         btnSignup = (Button)findViewById(R.id.buttonSignup);
+
+        foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (BeaconService.serviceIntent==null) {
+            foregroundServiceIntent = new Intent(this, BeaconService.class);
+            startService(foregroundServiceIntent);
+        } else {
+            foregroundServiceIntent = BeaconService.serviceIntent;//getInstance().getApplication();
+            Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
+        }
+
 
         editEmail.addTextChangedListener(new TextWatcher() {
             @Override
@@ -139,6 +152,17 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (foregroundServiceIntent!=null) {
+            stopService(foregroundServiceIntent);
+            foregroundServiceIntent = null;
+        }
 
     }
 

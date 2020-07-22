@@ -18,6 +18,9 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity{
     TextView textStatus;
+
+    //Intent foregroundServiceIntent;
+
     BluetoothAdapter bluetoothAdapter;
 
     private static final int REQUEST_ENABLE_BT = 420;
@@ -62,16 +65,21 @@ public class MainActivity extends AppCompatActivity{
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        Intent intent = new Intent(MainActivity.this,BeaconService.class);
-        //startActivity(intent);
-        startService(intent);
-
+        /*
+        if (BeaconService.serviceIntent==null) {
+            foregroundServiceIntent = new Intent(this, BeaconService.class);
+            startService(foregroundServiceIntent);
+        } else {
+            foregroundServiceIntent = BeaconService.serviceIntent;//getInstance().getApplication();
+            Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
+        }
+        */
         if(bluetoothAdapter == null){
             Toast.makeText(getApplicationContext(),"Bluetooth Not Support", Toast.LENGTH_SHORT).show();//블루투스가 지원하지 않을 경우
         }
@@ -96,4 +104,5 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
+
 }
