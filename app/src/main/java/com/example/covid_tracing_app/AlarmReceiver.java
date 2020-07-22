@@ -15,7 +15,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.d(TAG, "onTaskRemoved() called");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent in = new Intent(context, BeaconService.class);
+            Intent in = new Intent(context, RestartService.class);
             context.startForegroundService(in);
         } else {
             Intent in = new Intent(context, BeaconService.class);

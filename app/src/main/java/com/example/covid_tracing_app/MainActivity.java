@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity{
     BluetoothAdapter bluetoothAdapter;
 
     private static final int REQUEST_ENABLE_BT = 420;
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
     private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
         @Override
@@ -61,10 +60,6 @@ public class MainActivity extends AppCompatActivity{
 
         IntentFilter btFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(broadcastReceiver, btFilter);
-
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
 
     }
 

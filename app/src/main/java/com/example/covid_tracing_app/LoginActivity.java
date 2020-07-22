@@ -1,12 +1,16 @@
 package com.example.covid_tracing_app;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -16,6 +20,8 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.example.covid_tracing_app.BeaconService.serviceIntent;
 
 public class LoginActivity extends AppCompatActivity {
     EditText editEmail;
@@ -32,6 +38,9 @@ public class LoginActivity extends AppCompatActivity {
     //private String url = "http://1.251.103.64:8888";
     private String url = "http://180.189.121.112:63000";
 
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +51,6 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button)findViewById(R.id.buttonLogin);
         btnSignup = (Button)findViewById(R.id.buttonSignup);
 
-        foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         if (BeaconService.serviceIntent==null) {
             foregroundServiceIntent = new Intent(this, BeaconService.class);
@@ -56,6 +59,18 @@ public class LoginActivity extends AppCompatActivity {
             foregroundServiceIntent = BeaconService.serviceIntent;//getInstance().getApplication();
             Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
         }
+
+
+        foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
 
         editEmail.addTextChangedListener(new TextWatcher() {

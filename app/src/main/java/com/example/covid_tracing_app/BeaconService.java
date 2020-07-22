@@ -130,7 +130,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         }
 
     }
-
+    /*
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
@@ -146,7 +146,7 @@ public class BeaconService extends Service implements BeaconConsumer {
             mainThread = null;
         }
     }
-
+    */
     public void showToast(final Application application, final String msg) {
         Handler h = new Handler(application.getMainLooper());
         h.post(new Runnable() {
@@ -313,7 +313,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         protected String doInBackground(Void... params) {
             String result;
             RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
-            result = requestHttpURLConnection.request(url, values, method);
+            result = requestHttpURLConnection.request(url+"/send", values, method);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
 
