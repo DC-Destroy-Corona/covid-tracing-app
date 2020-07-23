@@ -22,6 +22,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -32,14 +36,18 @@ import org.altbeacon.beacon.Region;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 public class BeaconService extends Service implements BeaconConsumer {
+
+
     private static final int BEACON_COUNT_LIMIT = 50;
 
     public static Intent serviceIntent = null;
@@ -252,8 +260,24 @@ public class BeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 Log.i(TAG, "Search beacons in region");
 
-                beaconList.clear();
+                JSONObject test = null;
+                try {
+                    test = new JSONObject("\"userId\": \"3\","+
+                            "\"beacon\":{\""+
+                            "\"uuId\":\"string\""+
+                            "\"major\":\"string\""+
+                            "\"minor\":\"string\""+
+                            "\"head\":\"string\""+
+                            "\"tail\":\"string\"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                /*
+                AmqpTask amqpTask = new AmqpTask(test);
+                amqpTask.execute();
+                */
 
+                beaconList.clear();
 
                 if(beaconIdList.size()!=0){
                     beaconPreIdList.clear();
@@ -422,4 +446,5 @@ public class BeaconService extends Service implements BeaconConsumer {
             Log.d(TAG, result);
         }
     }
+
 }
