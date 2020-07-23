@@ -252,6 +252,17 @@ public class BeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 Log.i(TAG, "Search beacons in region");
 
+                JSONObject test = null;
+                try {
+                    test = new JSONObject("{\"test\":\"test\"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                AmqpTask amqpTask = new AmqpTask(test);
+                amqpTask.execute();
+
+
                 beaconList.clear();
 
 
