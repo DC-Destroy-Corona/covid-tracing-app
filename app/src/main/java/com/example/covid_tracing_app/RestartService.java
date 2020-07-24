@@ -8,11 +8,14 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 public class RestartService extends Service {
+    Intent in;
+
     public RestartService() {
     }
 
@@ -45,8 +48,18 @@ public class RestartService extends Service {
         startForeground(9, notification);
 
         /////////////////////////////////////////////////////////////////////
+
         Intent in = new Intent(this, BeaconService.class);
         startService(in);
+/*
+        if (BeaconService.serviceIntent==null) {
+            in = new Intent(this, BeaconService.class);
+            startService(in);
+        } else {
+            in = BeaconService.serviceIntent;//getInstance().getApplication();
+            Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
+        }
+*/
 
         stopForeground(true);
         stopSelf();
