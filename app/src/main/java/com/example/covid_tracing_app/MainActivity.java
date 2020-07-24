@@ -96,6 +96,10 @@ public class MainActivity extends AppCompatActivity{
             }
         }
 
+        if (BeaconService.serviceIntent == null) {
+            textStatus.setText("서비스를 활성화하기 위해 앱을 재실행 해주세요.");
+        }
+
         textStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
