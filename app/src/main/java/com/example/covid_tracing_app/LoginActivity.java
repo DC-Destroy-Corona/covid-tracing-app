@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -60,6 +62,17 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
         }
 
+
+        foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
+
+        String pass = "";
+        pass = PreferenceManager.getString(this,"uid");
+        String token = "";
+        token = PreferenceManager.getString(this,"token");
+        if(!(pass.equals("")||token.equals(""))){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
