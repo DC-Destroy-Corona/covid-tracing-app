@@ -3,6 +3,7 @@ package com.example.covid_tracing_app;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -35,15 +36,13 @@ public class AmqpTask extends AsyncTask<Void, Void, String> {
             Channel channel;
             connection = factory.newConnection();
             channel = connection.createChannel();
-            for(int i=0;i<=100000;i++){
-                channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-                String message = "Message" + (int) (Math.random() * 100);
-                channel.basicPublish("user.position", "user.position.route", null, message.getBytes());
-                System.out.println(" [x] Sent '" + message + "'");
-                Thread.sleep(10);
-                //channel.close();
-                //connection.close();
-            }
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.basicPublish("user.position", "user.position.route", new AMQP.BasicProperties.Builder().contentType("application/json").build(), jsonObject.toString().getBytes());
+            System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+            Thread.sleep(10);
+            //channel.close();
+            //connection.close();
+
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (IOException e) {

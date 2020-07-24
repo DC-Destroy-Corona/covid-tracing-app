@@ -22,10 +22,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -36,18 +32,17 @@ import org.altbeacon.beacon.Region;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 public class BeaconService extends Service implements BeaconConsumer {
-
-
     private static final int BEACON_COUNT_LIMIT = 50;
 
     public static Intent serviceIntent = null;
@@ -260,23 +255,6 @@ public class BeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 Log.i(TAG, "Search beacons in region");
 
-                JSONObject test = null;
-                try {
-                    test = new JSONObject("\"userId\": \"3\","+
-                            "\"beacon\":{\""+
-                            "\"uuId\":\"string\""+
-                            "\"major\":\"string\""+
-                            "\"minor\":\"string\""+
-                            "\"head\":\"string\""+
-                            "\"tail\":\"string\"}");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                /*
-                AmqpTask amqpTask = new AmqpTask(test);
-                amqpTask.execute();
-                */
-
                 beaconList.clear();
 
                 if(beaconIdList.size()!=0){
@@ -304,20 +282,27 @@ public class BeaconService extends Service implements BeaconConsumer {
                             indexList.add(index);
                             JSONObject jsonObject = new JSONObject();
                             try {
+                                //LocalDateTime currentTime = LocalDateTime.now();
                                 long now = System.currentTimeMillis();
                                 Date date = new Date(now);
-                                SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                                SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                                 String time = mFormat.format(date);
 
-                                jsonObject.put("uuId", uuid);
+                                jsonObject.put("uuid", uuid);
                                 jsonObject.put("major", major);
                                 jsonObject.put("minor", minor);
                                 jsonObject.put("head", time);
                                 jsonObject.put("tail","");
 
                                 if(jsonObjectList.size()>=BEACON_COUNT_LIMIT){
-                                    NetworkTask networkTask= new NetworkTask(url+"/send",jsonObjectList.get(0),"POST");
-                                    networkTask.execute();
+                                    //NetworkTask networkTask= new NetworkTask(url+"/send",jsonObjectList.get(0),"POST");
+                                    //networkTask.execute();
+                                    String userId = "3";
+                                    JSONObject message = new JSONObject();
+                                    message.put("userId",userId);
+                                    message.put("beacon",jsonObjectList.get(0));
+                                    AmqpTask amqpTask = new AmqpTask(message);
+                                    amqpTask.execute();
 
                                     jsonObjectList.remove(0);
                                     Log.e(TAG,"beacon count limit over");
@@ -351,11 +336,14 @@ public class BeaconService extends Service implements BeaconConsumer {
                     for (int j = 0; j < tempPreId.size(); j++) {
                         JSONObject jsonObject = new JSONObject();
                         try {
+                            //LocalDateTime currentTime = LocalDateTime.now();
+
                             long now = System.currentTimeMillis();
                             Date date = new Date(now);
-                            SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                            SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                             String time = mFormat.format(date);
-                            String head = "";
+
+                            String head = null;
                             String uuid = tempPreId.get(j);
                             String major = "";
                             String minor = "";
@@ -364,7 +352,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                             //list에 저장된 json 객체중 uuid 가 일치하는 객체 찾기
                             for(int k = 0; k < jsonObjectList.size(); k++){
                                 JSONObject temp = jsonObjectList.get(k);
-                                String tuuid = temp.getString("uuId");
+                                String tuuid = temp.getString("uuid");
                                 if(tuuid.equals(uuid)){
                                     //찾을경우 head 값을 따로 저장
                                     head = jsonObjectList.get(k).getString("head");
@@ -376,14 +364,22 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                             //일치하는 list가 존재할 경우
                             if(key<BEACON_COUNT_LIMIT){
-                                jsonObject.put("uuId", uuid);
+                                jsonObject.put("uuid", uuid);
                                 jsonObject.put("major", major);
                                 jsonObject.put("minor", minor);
                                 jsonObject.put("head", head);
                                 jsonObject.put("tail", time);
 
-                                NetworkTask networkTask= new NetworkTask(url+"/send",jsonObject,"POST");
-                                networkTask.execute();
+                                //NetworkTask networkTask= new NetworkTask(url+"/send",jsonObject,"POST");
+                                //networkTask.execute();
+
+                                String userId = "3";
+                                JSONObject message = new JSONObject();
+                                message.put("userId",userId);
+                                message.put("beacon",jsonObject);
+                                AmqpTask amqpTask = new AmqpTask(message);
+                                amqpTask.execute();
+
                                 //전송 후 list에서 삭제
                                 jsonObjectList.remove(key);
                             }else{//일치하는 list가 존재하지 않을 경우(BEACON_COUNT_LIMIT를 넘어 삭제된 경우)
@@ -446,5 +442,4 @@ public class BeaconService extends Service implements BeaconConsumer {
             Log.d(TAG, result);
         }
     }
-
 }
