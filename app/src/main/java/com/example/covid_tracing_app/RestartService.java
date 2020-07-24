@@ -51,15 +51,15 @@ public class RestartService extends Service {
 
         Intent in = new Intent(this, BeaconService.class);
         startService(in);
-/*
+        /*
         if (BeaconService.serviceIntent==null) {
             in = new Intent(this, BeaconService.class);
             startService(in);
         } else {
             in = BeaconService.serviceIntent;//getInstance().getApplication();
             Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
-        }
-*/
+        }*/
+
 
         stopForeground(true);
         stopSelf();

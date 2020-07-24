@@ -52,11 +52,12 @@ public class BeaconService extends Service implements BeaconConsumer {
     private static final String TAG = "BeaconService";
 
     private BeaconManager beaconManager;
-    // 감지된 비콘들을 임시로 담을 리스트
-    private List<Beacon> beaconList = new ArrayList<>();
-    private List<String> beaconIdList = new ArrayList<>();
-    private List<String> beaconPreIdList = new ArrayList<>();
-    private List<JSONObject> jsonObjectList = new ArrayList<>();
+
+    private List<Beacon> beaconList = new ArrayList<>();// 감지된 비콘들을 임시로 담을 리스트
+    private List<String> beaconIdList = new ArrayList<>();// 현재 범위 내에 감지되고 있는 비콘의 ID를 담을 리스트
+    private List<String> beaconPreIdList = new ArrayList<>();// 현재 범위 내에 감지되고 있는 비콘들이 변경 됐을 때 이전에 감지된 비콘의 ID을 담을 리스트
+    private List<String> newBeaconIdList = new ArrayList<>();// 새롭게 감지된 비콘을 찾기위한 index 리스트 (BeaconList의 index와 매칭)
+    private List<JSONObject> jsonObjectList = new ArrayList<>();// 새롭게 감지된 비콘 정보를 저장하는 리스트 (UUID, MAJOR, MINOR, HEAD(감지된 시간) 값을 저장)
 
     private int count = 0;
     private List<String> head = new ArrayList<>();
@@ -219,7 +220,7 @@ public class BeaconService extends Service implements BeaconConsumer {
     public void onBeaconServiceConnect() {
         Toast.makeText(getApplicationContext(),"Start Beacon scan service", Toast.LENGTH_LONG).show();
 
-
+        beaconManager.removeAllMonitorNotifiers();
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) { //이 엔터를 타야만 비콘검색가능
@@ -247,7 +248,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
+        beaconManager.removeAllRangeNotifiers();
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             // 비콘이 감지되면 해당 함수가 호출된다. Collection<Beacon> beacons에는 감지된 비콘의 리스트가,
@@ -264,12 +265,10 @@ public class BeaconService extends Service implements BeaconConsumer {
 
                 }
                 beaconIdList.clear();
-                List<Integer> indexList = new ArrayList<>();
+                newBeaconIdList.clear();
 
                 if (beacons.size() > 0) {
                     Log.i(TAG, "The first beacon I see is about "+beacons.iterator().next().getDistance()+" meters away.");
-
-                    int index = 0;
 
                     for (Beacon beacon : beacons) {
                         beaconList.add(beacon);
@@ -279,7 +278,8 @@ public class BeaconService extends Service implements BeaconConsumer {
                         beaconIdList.add(uuid);
                         //새로운 beacon 탐색
                         if(!beaconPreIdList.contains(uuid)){
-                            indexList.add(index);
+                            //beaconList에서
+                            newBeaconIdList.add(uuid);
                             JSONObject jsonObject = new JSONObject();
                             try {
                                 //LocalDateTime currentTime = LocalDateTime.now();
@@ -316,7 +316,6 @@ public class BeaconService extends Service implements BeaconConsumer {
                         }else {
                             //기존 존재하는 beacon에 대한 처리
                         }
-                        index++;
                     }
 
                 }
@@ -327,8 +326,10 @@ public class BeaconService extends Service implements BeaconConsumer {
                     List<String> tempPreId = new ArrayList<>();
                     tempPreId.addAll(beaconPreIdList);
                     //새로운 beacon이 있다면 제외
-                    for (int i = 0; i < indexList.size(); i++) {
-                        tempId.remove(tempId.indexOf(indexList.get(i)));
+
+                    for (int i = 0; i < newBeaconIdList.size(); i++) {
+                        String newBeaconId = newBeaconIdList.get(i);
+                        tempId.remove(newBeaconId);
                     }
                     //이전과 비교하여 여전히 존재하는 beacon 제외
                     tempPreId.removeAll(tempId);

@@ -26,7 +26,7 @@ public class AmqpTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        Log.d(TAG,"AMQP TEST");
+        Log.d(TAG,"Beacon AMQP TEST");
         factory.setHost("203.250.32.29");
         factory.setPort(54326);
         factory.setUsername("covid");
