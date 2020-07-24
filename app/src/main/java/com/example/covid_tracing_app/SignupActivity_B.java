@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,10 +29,12 @@ public class SignupActivity_B extends AppCompatActivity {
     Button btnNext;
     TextView textNoCode;
 
+    private String email = "";
     private int requestcode = 0;
-    //private String url = "http://203.250.32.29:80";
+
+    private String url = "http://203.250.32.29:8083";
     //private String url = "http://1.251.103.64:8888";
-    private String url = "http://180.189.121.112:63000";
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class SignupActivity_B extends AppCompatActivity {
         btnCheckCode = (Button)findViewById(R.id.buttonCheckCode);
         btnNext = (Button)findViewById(R.id.buttonNext);
         textNoCode = (TextView)findViewById(R.id.textViewNoCode);
+
     }
 
     @Override
@@ -77,8 +81,11 @@ public class SignupActivity_B extends AppCompatActivity {
         btnGetCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(editEmail.getWindowToken(), 0);
+
                 try {
-                    String email = editEmail.getText().toString().trim();
+                    email = editEmail.getText().toString().trim();
 
                     /* DB 대조 */
                     JSONObject values = new JSONObject();
@@ -87,11 +94,14 @@ public class SignupActivity_B extends AppCompatActivity {
                     NetworkTask networkTask = new NetworkTask(url+"/user/sign-up/email", values, "POST");
                     networkTask.execute();//서버로 인증코드 요청 후 반환
 
+                    Toast.makeText(getApplicationContext(),"이메일로 CODE를 요청하였습니다.",Toast.LENGTH_SHORT).show();
+
                     requestcode = 201;
                     btnGetCode.setEnabled(false);
                     btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogindisable));
                 }catch (JSONException e){
                     e.printStackTrace();
+                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
                     throw new RuntimeException(e);
                 }finally {
 
@@ -102,6 +112,9 @@ public class SignupActivity_B extends AppCompatActivity {
         btnCheckCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(editCode.getWindowToken(), 0);
+
                 try {
                     String email = editEmail.getText().toString().trim();
                     String code = editCode.getText().toString().trim();
@@ -119,6 +132,7 @@ public class SignupActivity_B extends AppCompatActivity {
                     btnCheckCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.btnlogindisable));
                 }catch (JSONException e){
                     e.printStackTrace();
+                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
                     throw new RuntimeException(e);
                 }finally {
 
@@ -141,7 +155,6 @@ public class SignupActivity_B extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = editEmail.getText().toString().trim();
 
                 Intent intent = new Intent(SignupActivity_B.this, SignupActivity_C.class);
 
@@ -186,7 +199,7 @@ public class SignupActivity_B extends AppCompatActivity {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
             if(result.contains("201")){
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),result.substring(result.indexOf("_")+1),Toast.LENGTH_LONG).show();
                 btnGetCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this, R.drawable.btnlogindisable));
                 btnGetCode.setEnabled(false);
                 btnCheckCode.setBackground(ContextCompat.getDrawable(SignupActivity_B.this, R.drawable.btnlogin));
@@ -194,7 +207,7 @@ public class SignupActivity_B extends AppCompatActivity {
                 textNoCode.setTextColor(ContextCompat.getColor(SignupActivity_B.this,R.color.colorTextMain));
                 textNoCode.setEnabled(true);
             }else if(result.contains("200")){
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),result.substring(result.indexOf("_")+1),Toast.LENGTH_LONG).show();
                 editEmail.setBackground(ContextCompat.getDrawable(SignupActivity_B.this,R.drawable.editdisable));
                 editEmail.setTextColor(ContextCompat.getColor(SignupActivity_B.this,R.color.colorTextHidden));
                 editEmail.setEnabled(false);

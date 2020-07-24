@@ -1,5 +1,6 @@
 package com.example.covid_tracing_app;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -17,38 +18,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity{
-    TextView textStatus;
+    private TextView textStatus;
 
-    //Intent foregroundServiceIntent;
 
     BluetoothAdapter bluetoothAdapter;
 
     private static final int REQUEST_ENABLE_BT = 420;
 
-    private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
-            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-                switch(state) {
-                    case BluetoothAdapter.STATE_OFF:
-                        textStatus.setText("블루투스가 켜져있지 않습니다.");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        textStatus.setText("TUNING OFF...");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        textStatus.setText("서비스가 활성화 중입니다.");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        textStatus.setText("TUNING ON...");
-                        break;
-                }
-            }
-        }
-    };
+//    private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = intent.getAction();
+//
+//            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+//                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+//                switch(state) {
+//                    case BluetoothAdapter.STATE_OFF:
+//                        textStatus.setText("블루투스가 켜져있지 않습니다.");
+//                        break;
+//                    case BluetoothAdapter.STATE_TURNING_OFF:
+//                        textStatus.setText("TUNING OFF...");
+//                        break;
+//                    case BluetoothAdapter.STATE_ON:
+//                        textStatus.setText("서비스가 활성화 중입니다.");
+//                        break;
+//                    case BluetoothAdapter.STATE_TURNING_ON:
+//                        textStatus.setText("TUNING ON...");
+//                        break;
+//                }
+//            }
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,13 @@ public class MainActivity extends AppCompatActivity{
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         textStatus = (TextView)findViewById(R.id.textViewStatus);
 
-        IntentFilter btFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(broadcastReceiver, btFilter);
+//        IntentFilter btFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+//        registerReceiver(broadcastReceiver, btFilter);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+
 
     }
 
@@ -100,4 +107,39 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+    // 마지막으로 뒤로 가기 버튼을 눌렀던 시간 저장
+    private long backKeyPressedTime = 0;
+    // 첫 번째 뒤로 가기 버튼을 누를 때 표시
+    private Toast toast;
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+
+        if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
+            backKeyPressedTime = System.currentTimeMillis();
+            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 종료
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
+            toast.cancel();
+            ActivityCompat.finishAffinity(this);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_ENABLE_BT){
+            textStatus.setText("서비스가 활성화 중입니다.");
+        }
+    }
 }

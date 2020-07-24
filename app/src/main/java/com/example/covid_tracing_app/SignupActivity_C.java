@@ -2,6 +2,7 @@ package com.example.covid_tracing_app;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,15 +20,15 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 public class SignupActivity_C extends AppCompatActivity {
-    EditText editID;
-    EditText editPassword;
-    EditText editConfirm;
-    EditText editName;
-    EditText editBirth;
-    EditText editPhone;
-    Button btnNext;
+    private EditText editID;
+    private EditText editPassword;
+    private EditText editConfirm;
+    private EditText editName;
+    private EditText editBirth;
+    private EditText editPhone;
+    private Button btnNext;
 
-    String ID = "";
+    private String ID = "";
 
     private boolean isPasswordEnable = false;
     private boolean isConfirmEnable = false;
@@ -38,9 +39,9 @@ public class SignupActivity_C extends AppCompatActivity {
     private String pass = "";
     private String confirm = "";
 
-    //private String url = "http://203.250.32.29:80";
+    private String url = "http://203.250.32.29:8083";
     //private String url = "http://1.251.103.64:8888";
-    private String url = "http://180.189.121.112:63000";
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class SignupActivity_C extends AppCompatActivity {
             editID.setEnabled(false);
             editID.setClickable(false);
         }else{
-            Toast.makeText(getApplicationContext(),"Loading Error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"이메일 값을 불러오지 못하였습니다.", Toast.LENGTH_SHORT).show();
         }
 
         editPassword.addTextChangedListener(new TextWatcher() {
@@ -298,7 +299,28 @@ public class SignupActivity_C extends AppCompatActivity {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
             if(result.contains("201")){
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), result.substring(result.indexOf("_")+1,result.indexOf(":")), Toast.LENGTH_LONG).show();
+
+                String data = result.substring(result.indexOf(":")+1);
+                String uid = "";
+                String token = "";
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(data);
+                    uid = jsonObject.getString("userId");
+                    token = jsonObject.getString("token");
+
+                    SharedPreferences prefs = getSharedPreferences("user", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("uid",uid);
+                    editor.commit();
+                    editor.putString("token",token);
+                    editor.commit();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 Intent intent = new Intent(SignupActivity_C.this, SignupActivity_D.class);
                 startActivity(intent);
 
@@ -308,21 +330,6 @@ public class SignupActivity_C extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
 
             }
-
-            String data = result.substring(result.indexOf("_")+1);
-            String uid = "";
-            String token = "";
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = new JSONObject(data);
-                uid = jsonObject.getString("userId");
-                token = jsonObject.getString("token");
-                PreferenceManager.setString(getApplicationContext(),"uid",uid);
-                PreferenceManager.setString(getApplicationContext(),"token",token);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
 
         }
     }

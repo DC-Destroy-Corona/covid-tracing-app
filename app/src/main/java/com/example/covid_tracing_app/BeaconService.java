@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -49,6 +51,8 @@ public class BeaconService extends Service implements BeaconConsumer {
 
     private Thread mainThread;
 
+    private String uid = "";
+
     private static final String TAG = "BeaconService";
 
     private BeaconManager beaconManager;
@@ -75,6 +79,9 @@ public class BeaconService extends Service implements BeaconConsumer {
     @Override
     public void onCreate() {
         super.onCreate();
+        SharedPreferences prefs = getSharedPreferences("user",MODE_PRIVATE);
+        uid = prefs.getString("uid", "");
+
         beaconManager = BeaconManager.getInstanceForApplication(this);
 
         // 여기가 중요한데, 기기에 따라서 setBeaconLayout 안의 내용을 바꿔줘야 하는듯 싶다.
@@ -94,7 +101,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         Log.d(TAG, "onStartCommand() called");
 
         serviceIntent = intent;
-        showToast(getApplication(), "Start Service");
+        //showToast(getApplication(), "Start Service");
         /*
         mainThread = new Thread(new Runnable() {
             @Override
@@ -137,7 +144,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         }
 
     }
-    /*
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
@@ -153,7 +160,7 @@ public class BeaconService extends Service implements BeaconConsumer {
             mainThread = null;
         }
     }
-    */
+
 
 
     public void showToast(final Application application, final String msg) {
@@ -218,7 +225,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        Toast.makeText(getApplicationContext(),"Start Beacon scan service", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"Start Beacon scan service", Toast.LENGTH_LONG).show();
 
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
@@ -374,7 +381,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                                 //NetworkTask networkTask= new NetworkTask(url+"/send",jsonObject,"POST");
                                 //networkTask.execute();
 
-                                String userId = "3";
+                                String userId = uid;
                                 JSONObject message = new JSONObject();
                                 message.put("userId",userId);
                                 message.put("beacon",jsonObject);

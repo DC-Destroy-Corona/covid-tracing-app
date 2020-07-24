@@ -181,13 +181,13 @@ public class RequestHttpURLConnection {
                 page = jsonObject.getString("msg");
                 if (!jsonObject.getString("data").isEmpty()){
                     jtoken=jsonObject.getJSONObject("data");
-                    return (Integer.toString(status))+"_"+jtoken.toString();
+                    return status+"_"+page+":"+jtoken.toString();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return (Integer.toString(status))+"_"+page;
+            return status+"_"+page;
 
         } catch (MalformedURLException e) { // for URL.
             e.printStackTrace();

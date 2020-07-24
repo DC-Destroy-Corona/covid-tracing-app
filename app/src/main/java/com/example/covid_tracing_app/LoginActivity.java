@@ -5,14 +5,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -26,22 +22,19 @@ import org.json.JSONObject;
 import static com.example.covid_tracing_app.BeaconService.serviceIntent;
 
 public class LoginActivity extends AppCompatActivity {
-    EditText editEmail;
-    EditText editPassword;
-    Button btnLogin;
-    Button btnSignup;
-
-    Intent foregroundServiceIntent;
+    private EditText editEmail;
+    private EditText editPassword;
+    private Button btnLogin;
+    private Button btnSignup;
 
     private boolean isEmailEnable = false;
     private boolean isPasswordEnable = false;
 
-    //private String url = "http://203.250.32.29:80";
+    Intent foregroundServiceIntent;
+
+    private String url = "http://203.250.32.29:8083";
     //private String url = "http://1.251.103.64:8888";
-    private String url = "http://180.189.121.112:63000";
-
-
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    //private String url = "http://180.189.121.112:63000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,30 +46,20 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button)findViewById(R.id.buttonLogin);
         btnSignup = (Button)findViewById(R.id.buttonSignup);
 
-
-        if (BeaconService.serviceIntent==null) {
-            foregroundServiceIntent = new Intent(this, BeaconService.class);
-            startService(foregroundServiceIntent);
-        } else {
-            foregroundServiceIntent = BeaconService.serviceIntent;//getInstance().getApplication();
-            Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
-        }
-
-
-        foregroundServiceIntent = new Intent(LoginActivity.this,BeaconService.class);
-
+        SharedPreferences prefs = getSharedPreferences("user",MODE_PRIVATE);
         String pass = "";
-        pass = PreferenceManager.getString(this,"uid");
-        String token = "";
-        token = PreferenceManager.getString(this,"token");
-        if(!(pass.equals("")||token.equals(""))){
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+        pass = prefs.getString("uid", "");
+
+        if(!pass.equals("")) {
+            if (BeaconService.serviceIntent == null) {
+                foregroundServiceIntent = new Intent(this, BeaconService.class);
+                startService(foregroundServiceIntent);
+            } else {
+                foregroundServiceIntent = BeaconService.serviceIntent;//getInstance().getApplication();
+                Toast.makeText(getApplicationContext(), "이미 서비스가 실행중입니다.", Toast.LENGTH_LONG).show();
+            }
         }
 
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
     }
 
     @Override
@@ -178,6 +161,24 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        //자동 로그인
+        SharedPreferences prefs = getSharedPreferences("user",MODE_PRIVATE);
+        String pass = "";
+        pass = prefs.getString("uid", "");
+        String token = "";
+        token = prefs.getString("token", "");
+        if(!(pass.equals("")||token.equals(""))){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            Toast.makeText(getApplicationContext(),"등록한 계정으로 자동 로그인 됩니다.",Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
 
     }
 
@@ -185,11 +186,18 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (foregroundServiceIntent!=null) {
-            stopService(foregroundServiceIntent);
-            foregroundServiceIntent = null;
+        SharedPreferences prefs = getSharedPreferences("user",MODE_PRIVATE);
+        String pass = "";
+        pass = prefs.getString("uid", "");
+
+        if(!pass.equals("")) {
+            if (foregroundServiceIntent != null) {
+                stopService(foregroundServiceIntent);
+                foregroundServiceIntent = null;
+            }
         }
 
+        //android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     public class NetworkTask extends AsyncTask<Void, Void, String> {
@@ -223,7 +231,7 @@ public class LoginActivity extends AppCompatActivity {
             // 통신이 완료되면 호출됩니다.
             // 결과에 따른 UI 수정 등은 여기서 합니다.
             if(result.contains("201")){
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),result.substring(result.indexOf("_")+1,result.indexOf(":")),Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }else{
