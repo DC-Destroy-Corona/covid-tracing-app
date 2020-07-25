@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
         if (BeaconService.serviceIntent == null) {
-            textStatus.setText("서비스를 활성화하기 위해 앱을 재실행 해주세요.");
+            textStatus.setText("서비스 활성화를 위해\n앱을 재실행 해주세요.");
         }
 
         textStatus.setOnClickListener(new View.OnClickListener() {
